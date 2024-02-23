@@ -16,3 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/dump', function() {
+    exec('composer dump-autoload');
+    Artisan::call('optimize');
+    return view('dump');
+});

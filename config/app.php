@@ -57,6 +57,10 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'app_name' => env('APP_NAME', 'Messaging'),
+    'storage_url' => env('STORAGE_APP_URL', 'http://localhost/'),
+    'conversion_api_url' => env('CONVERSION_API_URL', ''),
+
     'asset_url' => env('ASSET_URL'),
 
     /*
@@ -123,6 +127,8 @@ return [
     */
 
     'key' => env('APP_KEY'),
+    'jwt_key' => env('APP_KEY'),
+    'api_auth_code' => 'M#s$aging@24',
 
     'cipher' => 'AES-256-CBC',
 

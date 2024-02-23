@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('inbound_replies', function (Blueprint $table) {
             $table->id();
-            $table->string('firstname')->nullable();
-            $table->string('lastname')->nullable();
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->integer('role_id')->nullable();
-            $table->tinyInteger('status')->nullable()->default(1);
+            $table->integer('inbound_id')->nullable();
+            $table->string('phone_no')->nullable();
+            $table->string('sender_id')->nullable();
+            $table->string('template_id')->nullable();
+            $table->string('reply_text')->nullable();
+            $table->string('message_ref_id')->nullable();
             $table->integer('created_user_id')->nullable();
             $table->integer('updated_user_id')->nullable();
             $table->integer('deleted_user_id')->nullable();
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        //
     }
 };

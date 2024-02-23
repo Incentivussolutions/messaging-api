@@ -9,6 +9,7 @@ use App\Mail\OtpMail;
 use App\Models\Client;
 use App\Models\MailLog;
 use App\Models\EmailConfig;
+use Illuminate\Support\Str;
 use App\Models\StudentRegistration;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
@@ -98,19 +99,22 @@ class Common {
     /**
     * Change the application DB
     */
-    public static function changeDB($is_external = false) {
+    public static function changeClient($client_id) {
         $response = false;
 
         try {
-            if ($is_external == true) {
-                $db_name = Config::get('database.connections.mysql.external_database');
-                Config::set('database.connections.mysql.database', $db_name);
+            if ($client_id) {
+                Config::set('database.default', 'client');
+                $db_name = Config::get('database.connections.client.db_prefix').$client_id;
+                Config::set('database.connections.client.database', $db_name);
+                // If you want to use query builder without having to specify the connection
+                $conn = DB::reconnect('client');
             } else if ($is_external == false) {
-                Config::set('database.connections.mysql.database', Config::get('database.connections.mysql.default_database'));
+                Config::set('database.default', 'mysql');
+                Config::set('database.connections.mysql.database', Config::get('database.connections.mysql.database'));
+                // If you want to use query builder without having to specify the connection
+                $conn = DB::reconnect('mysql');
             }
-            // If you want to use query builder without having to specify the connection
-            Config::set('database.default', 'mysql');
-            $conn = DB::reconnect('mysql');
 
             if ($conn) {
                 $response = true;
@@ -191,6 +195,18 @@ class Common {
                 }
             }
             return $e;
+        }
+    }
+
+    
+    public static function getUUID() {
+        $uniqid = null;
+        try {
+            $uniqid = Str::uuid();
+            return $uniqid;
+        } catch(Exception $e) {
+            Log::info($e);
+            return null;
         }
     }
 

@@ -17,15 +17,12 @@ use Illuminate\Support\Facades\Storage;
 class AppStorage
 {
 
-    public static $school_store_path = 'schools/';
-    public static $external_store_path = 'external/';
-    public static $form_store_path = 'forms/';
+    public static $client_store_path = 'clients/';
+    public static $key_store_path = 'keys/';
     public static $template_store_path = 'templates/';
-    public static $export_store_path = 'exports/';
-    public static $sign_store_path = 'signs/';
-    public static $contact_store_path = 'contacts/';
-    public static $mail_attachment_store_path = 'attachments/';
-    public static $import_store_path = 'imports/';
+    public static $header_store_path = 'headers/';
+    public static $footer_store_path = 'footers/';
+    public static $custom_store_path = 'custom/';
     /**
     * Application Global File upload
     * File (store, generate URL, delete)
@@ -170,26 +167,17 @@ class AppStorage
     public static function getFolderFileUrl($module, $ref_id = null, $file_ref_id = null, $contact_ref_id = null, $form_slug = null, $folder = null) {
         $filesystems  = config('filesystems.default');
         $path = '';
-        if ($module == 'FORM') {
-            $path = self::$school_store_path.$ref_id.'/'.self::$form_store_path.$form_slug.'/'.$file_ref_id.'/';
+        if ($module == 'KEY') {
+            $path = self::$client_store_path.$ref_id.'/'.self::$key_store_path.'/'.$file_ref_id.'/';
             if ($folder != null) {
                 $path = $path.$folder.'/';
             }
-        } else if ($module == 'TEMPLATE') {
-            $path = self::$template_store_path.$file_ref_id.'/';
-        } else if ($module == 'FORM_SIGN') {
-            // if ($contact_ref_id) {
-            //     $path = self::$school_store_path.$ref_id.'/'.self::$contact_store_path.$contact_ref_id.'/'.self::$form_store_path.$file_ref_id.'/'.self::$sign_store_path;
-            // } else {
-            //     $path = self::$school_store_path.$ref_id.'/'.self::$form_store_path.$file_ref_id.'/'.self::$sign_store_path;
-            // }
-            $path = self::$school_store_path.$ref_id.'/'.self::$form_store_path.$form_slug.'/'.$file_ref_id.'/'.self::$sign_store_path;
-        } else if ($module == 'SCHOOL_SIGN') {
-            $path = self::$school_store_path.$ref_id.'/'.self::$sign_store_path;
-        } else if ($module == 'MAIL_ATTACHMENT') {
-            $path = self::$mail_attachment_store_path.$ref_id.'/';
-        } else if ($module == 'EXTERNAL') {
-            $path = self::$external_store_path.$ref_id.'/';
+        }
+        if ($module == 'HEADER') {
+            $path = self::$client_store_path.$ref_id.'/'.self::$template_store_path.'/'.$file_ref_id.'/'.self::$header_store_path;
+            if ($folder != null) {
+                $path = $path.$folder.'/';
+            }
         }
         $paths = array();
         if ($module == 'FORM' && $folder != null) {

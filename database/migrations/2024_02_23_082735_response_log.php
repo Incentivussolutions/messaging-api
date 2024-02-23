@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('response_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('firstname')->nullable();
-            $table->string('lastname')->nullable();
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->integer('role_id')->nullable();
-            $table->tinyInteger('status')->nullable()->default(1);
+            $table->integer('target_queue_id')->nullable();
+            $table->string('name')->nullable();
+            $table->text('response_data')->nullable();
+            $table->string('response_code')->nullable();
+            $table->string('message_ref_id')->nullable();
             $table->integer('created_user_id')->nullable();
             $table->integer('updated_user_id')->nullable();
             $table->integer('deleted_user_id')->nullable();
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        //
     }
 };

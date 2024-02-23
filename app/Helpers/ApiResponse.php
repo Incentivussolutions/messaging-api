@@ -79,7 +79,8 @@
                 $response['message'] = $message;
             }
             if (!$is_validator) {
-                $response['message'] = __('messages.'.$response['message']);
+                $response['message'] = $response['message'];
+                // $response['message'] = __('messages.'.$response['message']);
             }
             // $response['label_locale'] = Lang::get('labels');
             return response($response, $httpcode)->header('Content-Type', self::$api_content_type);
