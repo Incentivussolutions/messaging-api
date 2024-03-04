@@ -89,5 +89,6 @@ class RunMigration extends Command
                 }
             }
         }
+        Common::changeClient();
     }
 }

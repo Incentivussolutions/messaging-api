@@ -5,26 +5,28 @@ namespace App\Helpers;
 use DB;
 use Exception;
 use App\Mail\Mailer;
-use App\Mail\OtpMail;
 use App\Models\Client;
 use App\Models\MailLog;
 use App\Models\EmailConfig;
 use Illuminate\Support\Str;
-use App\Models\StudentRegistration;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Encryption\DecryptException;
 
 class Common {
 
-    public static function encrypt($plain) {
+    public static function encrypt($plain, $key = null) {
         try {
             if (is_array($plain) || is_object($plain)) {
                 $plain = json_encode($plain);
+            }
+            if ($key) {
+                Config::set('app.key', $key);
             }
             $encrypted = Crypt::encryptString($plain);
             return $encrypted;
@@ -99,7 +101,7 @@ class Common {
     /**
     * Change the application DB
     */
-    public static function changeClient($client_id) {
+    public static function changeClient($client_id = null) {
         $response = false;
 
         try {
@@ -109,7 +111,7 @@ class Common {
                 Config::set('database.connections.client.database', $db_name);
                 // If you want to use query builder without having to specify the connection
                 $conn = DB::reconnect('client');
-            } else if ($is_external == false) {
+            } else {
                 Config::set('database.default', 'mysql');
                 Config::set('database.connections.mysql.database', Config::get('database.connections.mysql.database'));
                 // If you want to use query builder without having to specify the connection
@@ -207,6 +209,43 @@ class Common {
         } catch(Exception $e) {
             Log::info($e);
             return null;
+        }
+    }
+    
+    public static function getClientAuthKey($client) {
+        $uniqid = null;
+        try {
+            $auth_key = Str::upper($client->name.$client->id.date('Ymdhis'));
+            return $auth_key;
+        } catch(Exception $e) {
+            Log::info($e);
+            return null;
+        }
+    }
+    
+    public static function getRandomKey($length = 16) {
+        $uniqid = null;
+        try {
+            $auth_key = Str::random($length);
+            return $auth_key;
+        } catch(Exception $e) {
+            Log::info($e);
+            return null;
+        }
+    }
+    
+    public static function createClientDB($client) {
+        try {
+            Artisan::call('run:migration '.$client->id);
+            Log::info($output = Artisan::output());
+            Artisan::call('run:seeding '.$client->id);
+            Log::info($output = Artisan::output());
+            Artisan::call('run:seeding '.$client->id.' --class=DefaultUserSeeder');
+            Log::info($output = Artisan::output());
+            return true;
+        } catch(Exception $e) {
+            Log::info($e);
+            return false;
         }
     }
 

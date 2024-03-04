@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Helpers\Date;
 use App\Helpers\Common;
+use App\Helpers\Vonage;
 use App\Helpers\AppStorage;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +23,7 @@ class TemplateConfig extends Model implements Auditable
     protected $fillable = [
         'template_name',
         'template_type',
+        'template_namespace',
         'template_id',
         'template_key',
         'whatspp_config_id',
@@ -43,6 +46,7 @@ class TemplateConfig extends Model implements Auditable
         'template_name' => 'string',
         'template_type' => 'integer',
         'template_id'   => 'string',
+        'template_namespace'   => 'string',
         'template_key'  => 'string',
         'whatspp_config_id' => 'integer',
         'language_id'   => 'integer',
@@ -60,6 +64,7 @@ class TemplateConfig extends Model implements Auditable
         'template_configs.id', 
         'template_configs.template_name',
         'template_configs.template_type',
+        'template_configs.template_namespace',
         'template_configs.template_id',
         'template_configs.template_key',
         'template_configs.whatspp_config_id',
@@ -103,6 +108,10 @@ class TemplateConfig extends Model implements Auditable
 
     public function getFooterAttribute($value) {
         return (@$value) ? json_decode(json_decode($value), true) : null;
+    }
+
+    public function language() {
+        return $this->hasOne(Language::class, 'id', 'language_id');
     }
 
     public static function index($request) {
@@ -149,6 +158,23 @@ class TemplateConfig extends Model implements Auditable
         }
     }
 
+    public static function getTemplateByTemplateID($template_id) {
+        $response = null;
+        try {
+            if (@$template_id) {
+                $qry = TemplateConfig::select(self::$fields)
+                            ->with('language')
+                            ->whereNull('template_configs.deleted_at')
+                            ->where('template_configs.template_id', '=', $template_id);
+                $response = $qry->first();
+            }
+            return $response;
+        } catch(Exception $e) {
+            Log::info($e);
+            return $response;
+        }
+    }
+
     public static function store($request) {
         $response = null;
         try {
@@ -159,16 +185,24 @@ class TemplateConfig extends Model implements Auditable
             } else {
                 $template_config = new TemplateConfig;
                 $template_config->created_user_id = $request->user['id'];
-                $template_config->template_id     = Common::getUUID();
+                while(true) {
+                    $uuid           = Common::getUUID();
+                    $is_exists      = TemplateConfig::where('template_id', '=', $uuid)->first();
+                    if (!$is_exists) {
+                        break;
+                    }
+                }
+                $template_config->template_id    = $uuid;
             }
             $template_config->template_name      = @$request->template_name;
             $template_config->template_type      = @$request->template_type;
+            $template_config->template_namespace = @$request->template_namespace;
             $template_config->template_key       = @$request->template_key;
             $template_config->whatspp_config_id  = @$request->whatspp_config_id;
             $template_config->language_id        = @$request->language_id;
             $template_config->template_content   = @$request->template_content;
             $template_config->header             = (@$request->header) ? json_encode($request->header) : null;
-            $template_config->footer             = (@$request->header) ? json_encode($request->footer) : null;
+            $template_config->footer             = (@$request->footer) ? json_encode($request->footer) : null;
             $template_config->status             = @$request->status;
             if($template_config->save()) { 
                 if (@$request->files && $request->file('header_file')) {
@@ -211,11 +245,11 @@ class TemplateConfig extends Model implements Auditable
     }
 
     
-    public static function getHeaderUrl($request, $template_config) {
+    public static function getHeaderUrl($client_id, $template_config) {
         $path = null;
         $header = $template_config->header;
-        if (@$header['field_type'] == 2) {
-            $path = AppStorage::getFolderFileUrl('HEADER', $request->client['id'], $template_config->id);
+        if (@$header['input_type'] == 2) {
+            $path = AppStorage::getFolderFileUrl('HEADER', $client_id, $template_config->id);
         }
         return $path;
     }
@@ -226,4 +260,16 @@ class TemplateConfig extends Model implements Auditable
     //         $path = AppStorage::$client_store_path.$request->client['id'].'/'.AppStorage::$template_store_path.$template_config->id.'/'.AppStorage::$header_store_path;
     //     }
     // }
+
+    public static function downloadWhatsappTemplates($request) {
+        try {
+            $response = Vonage::getTemplatesFromWhatsapp($request->waba_id);
+            if (@$response['templates']) {
+                dd($response);
+            }
+        } catch(Exception $e) {
+            Log::info($e);
+            return null;
+        }
+    }
 }

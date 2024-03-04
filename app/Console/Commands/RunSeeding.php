@@ -75,5 +75,6 @@ class RunSeeding extends Command
                 echo "No client found.";
             }
         }
+        Common::changeClient();
     }
 }

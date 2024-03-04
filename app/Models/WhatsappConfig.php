@@ -150,6 +150,22 @@ class WhatsappConfig extends Model implements Auditable
         }
     }
 
+    public static function getWhatsappConfigByID($id) {
+        $response = null;
+        try {
+            if (@$id) {
+                $qry = WhatsappConfig::select(self::$fields)
+                            ->whereNull('whatsapp_configs.deleted_at')
+                            ->where('whatsapp_configs.id', '=', $id);
+                $response = $qry->first();
+            }
+            return $response;
+        } catch(Exception $e) {
+            Log::info($e);
+            return $response;
+        }
+    }
+
     public static function store($request) {
         $response = null;
         try {

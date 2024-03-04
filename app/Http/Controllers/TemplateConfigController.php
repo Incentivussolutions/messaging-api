@@ -63,8 +63,8 @@ class TemplateConfigController extends Controller
                 return ApiResponse::send(203, null, $validator->errors()->first(), true);
             }
             $response['data'] = TemplateConfig::first($request);
-            if (@$response['data']) {
-                $response['data']['header_url'] = TemplateConfig::getHeaderUrl($request, $response['data']);
+            if (@$response['data'] && @$response['data']->header) {
+                $response['data']['header_url'] = TemplateConfig::getHeaderUrl($request->client['id'], $response['data']);
             }
             $response['whatsapp_configs'] = WhatsappConfig::get($request);
             $response['languages'] = CommonData::get('TEMPLATE_LANGUAGE');
@@ -125,6 +125,7 @@ class TemplateConfigController extends Controller
                 'id'            => ['integer', 'nullable'],
                 'template_name' => ['string', 'required'],
                 'template_type' => ['integer', 'required'],
+                'template_namespace' => ['string', 'required'],
                 'whatspp_config_id'=> ['integer', 'required'],
                 'template_content' => ['string', 'required'],
                 'status'        => ['integer', 'nullable']
@@ -140,8 +141,8 @@ class TemplateConfigController extends Controller
             } else {
                 $validator['template_key']  = ['string', 'required'];
                 $validator['language_id']   = ['string', 'required'];
-                $validator['header']        = ['array', 'required'];
-                $validator['footer']        = ['array', 'required'];
+                $validator['header']        = ['array', 'nullable'];
+                $validator['footer']        = ['array', 'nullable'];
             }
             $validator = Common::validator($request, $validator);
             if ($validator && $validator->fails()) {

@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\TemplateConfigController;
 use App\Http\Controllers\WhatsappConfigController;
@@ -26,6 +28,7 @@ Route::get('/token', [ApplicationController::class, 'getCommonToken']);
 Route::post('client/search', [ApplicationController::class, 'clientSearch']);
 Route::group(['middleware'=> ['auth.common']], function() {
     Route::post('app/login', [ApplicationController::class, 'login']);
+    Route::post('client/create', [ClientController::class, 'create']);
 });
 
 Route::group(['middleware'=> ['auth.api']], function() {
@@ -44,3 +47,8 @@ Route::group(['middleware'=> ['auth.api']], function() {
     Route::post('template-config/form-data', [TemplateConfigController::class, 'formData']);
     Route::post('template-config/store', [TemplateConfigController::class, 'store']);
 });
+Route::group(['middleware'=> ['auth.client']], function() {
+    Route::post('send/message', [MessageController::class, 'sendMessage']);
+    Route::post('send/messages', [MessageController::class, 'sendMessage']);
+});
+Route::get('download/templates', [MessageController::class, 'downloadWhatsappTemplates']);

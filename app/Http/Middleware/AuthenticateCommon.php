@@ -19,14 +19,14 @@ class AuthenticateCommon
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->getPathInfo() == '/api/client/get-list') {
+        if ($request->getPathInfo() == '/api/client/create') {
             return $next($request);
         }
         if (!@$request->client) {
             return ApiResponse::send(401, null, "Invalid url");
         }
         $client = Client::where('unique_id', '=', $request->client)
-                        ->where('client_status', '=', 1)
+                        ->where('status', '=', 1)
                         ->first();
         if (!$client) {
             return ApiResponse::send(401, null, "Invalid request");
