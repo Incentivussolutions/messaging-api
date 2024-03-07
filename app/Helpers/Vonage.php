@@ -65,7 +65,6 @@ class Vonage {
                 }
                 if ($base_message) {
                     $base_message->setClientRef(@$client['unique_id']);
-                    dd($base_message);
                     $response = $vonage_client->messages()->send($base_message);
                     $res_store = array(
                         'target_queue'  => $target_queue,
