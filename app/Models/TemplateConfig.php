@@ -5,8 +5,12 @@ namespace App\Models;
 use App\Helpers\Date;
 use App\Helpers\Common;
 use App\Helpers\Vonage;
+use App\Models\CommonData;
 use App\Helpers\AppStorage;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use App\Models\TemplateType;
+use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -83,6 +87,10 @@ class TemplateConfig extends Model implements Auditable
         'name'      => 'template_configs.template_name'
     ];
 
+    
+    protected $appends = [
+    ];
+
     // AuditLog Functions
 
     public function transformAudit(array $data): array {
@@ -114,10 +122,19 @@ class TemplateConfig extends Model implements Auditable
         return $this->hasOne(Language::class, 'id', 'language_id');
     }
 
+    public function whatsappConfig() {
+        return $this->hasOne(WhatsappConfig::class, 'id', 'whatspp_config_id');
+    }
+
+    public function selectedTemplateType() {
+        return $this->hasOne(TemplateType::class, 'id', 'template_type');
+    }
+
     public static function index($request) {
         $response = null;
         try {
-            $qry = TemplateConfig::select(self::$fields);
+            $qry = TemplateConfig::select(self::$fields)
+                                   ->with('language', 'whatsappConfig', 'selectedTemplateType');
             $qry = Common::searchIndex($qry, $request, self::$search_fields);
             $qry = Common::orderIndex($request, $qry);
             $response = $qry->paginate(@$request->limit);
