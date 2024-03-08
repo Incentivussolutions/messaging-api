@@ -92,9 +92,11 @@ class MessageController extends Controller
             }
             $key_file = $config->key_file;
             $target_queue = TargetQueue::store($request);
+            $header_url = TemplateConfig::getHeaderUrl($request->client['id'], $template);
             $template = $template->toArray();
             $config = $config->toArray();
             $config['key_file'] = $key_file;
+            $template['header_url'] = $header_url;
             $target_queue = $target_queue->toArray();
             Common::changeClient();
             foreach($request->to_send as $key => $value) {

@@ -118,10 +118,18 @@ class Vonage {
             $components = array();
             $header = $template->header;
             if(@$header) {
+                $header_url = null;
                 $params = self::getParameters(@$header['text']);
+                if (@$template->header_url[0]) {
+                    $header_url = $template->header_url[0];
+                } else {
+                    $url = TemplateConfig::getHeaderUrl($client['id'], $template);
+                    if (@$url[0]) {
+                        $header_url = $url[0];
+                    }
+                }
+                $header_parameters = array();
                 if (count($params) > 0) {
-                    $header_parameters = array();
-                    $header_url = TemplateConfig::getHeaderUrl($client['id'], $template);
                     foreach($params as $k => $v) {
                         if (@$header['input_type'] == 1) { // Text
                             $param = array(
@@ -131,9 +139,15 @@ class Vonage {
                                 )
                             );
                         } else if (@$header['input_type'] == 2) { // Image
+                            if (@$header['url']) {
+                                $link = (@$client_parameters[$v]) ? $client_parameters[$v] : $header['url'];
+                            }
                             $param = array(
                                 'parameters' => array(
-                                    'type' => 'image'
+                                    'type' => 'image',
+                                    'image'=> array(
+                                        'link' => $link
+                                    )
                                 )
                             );
                         } else if (@$header['input_type'] == 3) { // Video
@@ -149,11 +163,6 @@ class Vonage {
                                 )
                             );
                         }
-                        if (@$header['url']) {
-                            $param['parameters']['link'] = (@$client_parameters[$v]) ? $client_parameters[$v] : $header['url'];
-                        } else {
-                            $param['parameters']['link'] = (@$client_parameters[$v]) ? $client_parameters[$v] : @$header_url[0];
-                        }
                         if (@$header['caption']) {
                             $param['parameters']['caption'] = $header['caption'];
                         }
@@ -162,12 +171,34 @@ class Vonage {
                         }
                         $header_parameters[] = $param;
                     }
-                    if (count($header_parameters) > 0) {
-                        $components[] = array(
-                            'type' => 'header',
-                            'parameters' => $header_parameters
+                } else if ($header_url) {
+                    if (@$header['input_type'] == 2) { // Image
+                        $param = array(
+                            'type' => 'image',
+                            'image' => array(
+                                'link' => @$header_url
+                            )
+                        );
+                    } else if (@$header['input_type'] == 3) { // Video
+                        $param = array(
+                            'parameters' => array(
+                                'type' => 'video'
+                            )
+                        );
+                    } else if (@$header['input_type'] == 4) { // Document
+                        $param = array(
+                            'parameters' => array(
+                                'type' => 'document',
+                            )
                         );
                     }
+                    $header_parameters[] = $param;
+                }
+                if (count($header_parameters) > 0) {
+                    $components[] = array(
+                        'type' => 'header',
+                        'parameters' => $header_parameters
+                    );
                 }
             }
             $body = $template->template_content;
@@ -202,7 +233,7 @@ class Vonage {
                                     'type' => 'text',
                                     'text' => @$client_parameters[$v]
                                 );
-                                $footer_parameters[] = $param;
+                                $footer_parameters = $param;
                             }
                         }
                     } else {
@@ -215,7 +246,7 @@ class Vonage {
                                     'sub_type' => @$value['sub_type'],
                                 );
                                 if (@$value['sub_type'] == 'url') {
-                                    $param['parameters'] = array(
+                                    $param['parameters'][] = array(
                                         'type' => 'text',
                                         'text' => @$client_parameters[$v]
                                     );
@@ -230,13 +261,13 @@ class Vonage {
                                         'coupon_code' => @$client_parameters[$v]
                                     );
                                 }
-                                $footer_parameters[] = $param;
+                                $footer_parameters = $param;
+                                if (count($footer_parameters) > 0) {
+                                    $components[] = $footer_parameters;
+                                }
                             }
                         }
                     }
-                }
-                if (count($footer_parameters) > 0) {
-                    $components[] = $footer_parameters;
                 }
             }
             return $components;
