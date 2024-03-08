@@ -30,6 +30,7 @@ Route::post('client/status', [MessageController::class, 'status']);
 Route::post('client/inbound', [MessageController::class, 'inbound']);
 Route::group(['middleware'=> ['auth.common']], function() {
     Route::post('app/login', [ApplicationController::class, 'login']);
+    Route::post('app/logout', [ApplicationController::class, 'logout']);
     Route::post('client/create', [ClientController::class, 'create']);
 });
 
