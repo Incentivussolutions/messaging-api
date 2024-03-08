@@ -236,7 +236,7 @@ class Vonage {
                     }
                 }
                 if (count($footer_parameters) > 0) {
-                    $components[] = $parameters;
+                    $components[] = $footer_parameters;
                 }
             }
             return $components;
