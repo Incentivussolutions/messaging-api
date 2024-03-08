@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Status;
+use App\Jobs\Message;
 use App\Helpers\Common;
 use App\Helpers\Vonage;
+use App\Models\StatusLog;
 use App\Models\ResponseLog;
 use App\Models\TargetQueue;
 use App\Helpers\ApiResponse;
@@ -43,7 +46,13 @@ class MessageController extends Controller
             }
             $target_queue = TargetQueue::store($request);
             $response = Vonage::sendMessage($request, $config, $template, $target_queue);
-            if ($response) {                
+            if ($response) {
+                $res_store = array(
+                    'target_queue' => $target_queue,
+                    'response'     => $response
+                );
+                Log::info($res_store);
+                ResponseLog::store((Object) $res_store);
                 return ApiResponse::send(200, null, "Message sent successfully");
             } else {
                 return ApiResponse::send(203);
@@ -81,22 +90,40 @@ class MessageController extends Controller
             if (!@$config && !@$wa->sender_id) {
                 return ApiResponse::send(203, null, "No Whatsapp Configurations Found");
             }
+            $key_file = $config->key_file;
             $target_queue = TargetQueue::store($request);
+            $template = $template->toArray();
+            $config = $config->toArray();
+            $config['key_file'] = $key_file;
+            $target_queue = $target_queue->toArray();
             Common::changeClient();
-            Message::dispatch($template, $config, $request->all());
-            $response = Vonage::sendMessage($request, $config, $template);
-            if ($response) {
-                $res_store = array(
-                    'target_queue' => $target_queue,
-                    'response'     => $response
-                );
-                Log::info($res_store);
-                ResponseLog::store((Object) $res_store);
-                return ApiResponse::send(200, null, "Message sent successfully");
-            } else {
-                return ApiResponse::send(203);
+            foreach($request->to_send as $key => $value) {
+                Message::dispatch($request->client, $value['to_number'], $value['parameters'], $template, $config, $target_queue)->onQueue('high');
             }
-            return ApiResponse::send(200, null, "Messages added in the queue");
+            $response = array(
+                'batch_id' => $target_queue['id']
+            );
+            return ApiResponse::send(200, $response, "Messages added in the queue successfully");
+        } catch(Exception $e) {
+            Log::info($e);
+            return ApiResponse::send(500);
+        }
+    }
+
+    public function getStatus(Request $request) {
+        try {
+            $response = [];
+            // Validation given Data's
+            $validator = array(
+                'client'        => ['array', 'required'],
+                'batch_id'      => ['integer', 'required'],
+            );
+            $validator = Common::validator($request, $validator);
+            if ($validator && $validator->fails()) {
+                return ApiResponse::send(203, null, $validator->errors()->first(), true);
+            }
+            $response = StatusLog::getStatus($request);
+            return ApiResponse::send(200, $response, "Messages added in the queue successfully");
         } catch(Exception $e) {
             Log::info($e);
             return ApiResponse::send(500);
@@ -122,6 +149,19 @@ class MessageController extends Controller
             $response = TemplateConfig::downloadWhatsappTemplates($request);
             dd($response);
         } catch(Exception $e) {
+            Log::info($e);
+            return ApiResponse::send(500);
+        }
+    }
+
+    public function status(Request $request) {
+        try {
+            Log::info($request->all());
+            if (@$request->client_ref) {
+                Status::dispatch($request->all());
+            }
+            return ApiResponse::send(200);
+        } catch (Exception $e) {
             Log::info($e);
             return ApiResponse::send(500);
         }

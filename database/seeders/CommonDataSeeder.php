@@ -24,7 +24,7 @@ class CommonDataSeeder extends Seeder
             "type" => "TEMPLATE_LANGUAGE",
             "value" => 2,
             "description" => "Irish",
-            "reference" => "ga",
+            "reference" => "IE",
             "sample" => NULL
         ),
         array(

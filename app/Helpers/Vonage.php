@@ -33,16 +33,16 @@ class Vonage {
         'sticker',
         'custom'
     );
-    public static function sendMessage($request, $config, $template, $target_queue = null) {
+    public static function sendMessage($request, $config, $template, $target_queue = null, $from_queue = false) {
         try {
             $client = @$request->client;
             $from_number = $config->sender_id;
             self::setClientConfig($config);
             $application_id = config('vonage.application_id');
             $vonage_client = new Client(new Keypair(config('vonage.private_key'), new Application($application_id)));
-            foreach($request->to_send as $key => $value) {
-                $to_number  = $value['to_number'];
-                $parameters = $value['parameters'];
+            if ($from_queue) {
+                $to_number  = $request->to_number;
+                $parameters = $request->parameters;
                 if ($template->template_type == 1) {
                     $components = self::getComponents($client, $template, $parameters);
                     $custom = array(
@@ -65,14 +65,45 @@ class Vonage {
                 }
                 if ($base_message) {
                     $base_message->setClientRef(@$client['unique_id']);
+                    Log::info($base_message->getCustom());
                     $response = $vonage_client->messages()->send($base_message);
-                    $res_store = array(
-                        'target_queue'  => $target_queue,
-                        'to_number'     => $to_number,
-                        'response'      => $response
-                    );
-                    Log::info($res_store);
-                    ResponseLog::store((Object) $res_store);
+                }
+            } else {
+                foreach($request->to_send as $key => $value) {
+                    $to_number  = $value['to_number'];
+                    $parameters = $value['parameters'];
+                    if ($template->template_type == 1) {
+                        $components = self::getComponents($client, $template, $parameters);
+                        $custom = array(
+                            'type' => "template",
+                            'template' => array(
+                                'namespace' => $template->template_key,
+                                'name' => $template->template_namespace,
+                                'language' => array(
+                                    'policy' => self::$policy,
+                                    'code'   => @$template->language->code
+                                ),
+                                'components' => $components
+                            )
+                        );
+                        $base_message = new WhatsAppCustom($to_number, $from_number, $custom);
+                    } else {
+                        // Others
+                        $message = "";
+                        $base_message = new WhatsAppText($to_number, $from_number, $message);
+                    }
+                    if ($base_message) {
+                        $base_message->setClientRef(@$client['unique_id']);
+                        Log::info($base_message->getCustom());
+                        $response = $vonage_client->messages()->send($base_message);
+                        $res_store = array(
+                            'target_queue'  => $target_queue,
+                            'to_number'     => $to_number,
+                            'response'      => $response
+                        );
+                        Log::info($res_store);
+                        ResponseLog::store((Object) $res_store);
+                    }
                 }
             }
             return $response;
@@ -215,9 +246,15 @@ class Vonage {
         }
     }
 
-    public static function replacePlaceholders($body, $placeholder_values) {
+    public static function replacePlaceholders($body, $placeholder_values, $db_name = null) {
         try {
-            $placeholders = CommonData::get('PLACHOLDER');
+            if ($db_name) {
+                $placeholders = DB::table($db_name.".common_data")
+                                ->where('type', '=', 'PLACHOLDER')
+                                ->get();
+            } else {
+                $placeholders = CommonData::get('PLACHOLDER');
+            }
             foreach($placeholders as $key => $value) {
                 $body = str_replace("{{".Str::upper($value->description)."}}", @$placeholder_values[Str::lower($value->description)], $body);
             }

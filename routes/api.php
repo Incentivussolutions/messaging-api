@@ -26,6 +26,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/token', [ApplicationController::class, 'getCommonToken']);
 Route::post('client/search', [ApplicationController::class, 'clientSearch']);
+Route::post('client/status', [MessageController::class, 'status']);
+Route::post('client/inbound', [MessageController::class, 'inbound']);
 Route::group(['middleware'=> ['auth.common']], function() {
     Route::post('app/login', [ApplicationController::class, 'login']);
     Route::post('client/create', [ClientController::class, 'create']);
@@ -49,6 +51,7 @@ Route::group(['middleware'=> ['auth.api']], function() {
 });
 Route::group(['middleware'=> ['auth.client']], function() {
     Route::post('send/message', [MessageController::class, 'sendMessage']);
-    Route::post('send/messages', [MessageController::class, 'sendMessage']);
+    Route::post('send/messages', [MessageController::class, 'queueMessage']);
+    Route::post('messages/status', [MessageController::class, 'getStatus']);
 });
 Route::get('download/templates', [MessageController::class, 'downloadWhatsappTemplates']);
