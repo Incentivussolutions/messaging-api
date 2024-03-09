@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\StatusLogController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\TemplateConfigController;
 use App\Http\Controllers\WhatsappConfigController;
@@ -49,10 +50,13 @@ Route::group(['middleware'=> ['auth.api']], function() {
     Route::post('template-config/get-list', [TemplateConfigController::class, 'getList']);
     Route::post('template-config/form-data', [TemplateConfigController::class, 'formData']);
     Route::post('template-config/store', [TemplateConfigController::class, 'store']);
+    Route::post('status/index', [StatusLogController::class, 'index']);
+    Route::post('auth-key/get', [ApplicationController::class, 'getAuthKey']);
 });
 Route::group(['middleware'=> ['auth.client']], function() {
     Route::post('send/message', [MessageController::class, 'sendMessage']);
     Route::post('send/messages', [MessageController::class, 'queueMessage']);
     Route::post('messages/status', [MessageController::class, 'getStatus']);
+    Route::post('templates/get', [MessageController::class, 'getTemplates']);
 });
 Route::get('download/templates', [MessageController::class, 'downloadWhatsappTemplates']);

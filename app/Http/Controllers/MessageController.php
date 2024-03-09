@@ -132,6 +132,33 @@ class MessageController extends Controller
         }
     }
 
+    public function getTemplates(Request $request) {
+        try {
+            $response = [];
+            // Validation given Data's
+            $validator = array(
+                'client'        => ['array', 'required']
+            );
+            $validator = Common::validator($request, $validator);
+            if ($validator && $validator->fails()) {
+                return ApiResponse::send(203, null, $validator->errors()->first(), true);
+            }
+            $response = TemplateConfig::getClientTemplates($request);
+            if ($response) {
+                foreach($response as $key => $value) {
+                    $url = TemplateConfig::getPreviewUrl($request->client['id'], $value);
+                    $response[$key]['preview_url'] = (@$url[0]) ? $url[0] : null;
+                }
+            } else {
+                return ApiResponse::send(203, null, "Error getting templates");
+            }
+            return ApiResponse::send(200, $response, "Template List");
+        } catch(Exception $e) {
+            Log::info($e);
+            return ApiResponse::send(500);
+        }
+    }
+
     public function downloadWhatsappTemplates(Request $request) {
         try {
             $response = [];

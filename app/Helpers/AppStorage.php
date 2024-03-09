@@ -20,6 +20,7 @@ class AppStorage
     public static $client_store_path = 'clients/';
     public static $key_store_path = 'keys/';
     public static $template_store_path = 'templates/';
+    public static $template_review_store_path = 'preview/';
     public static $header_store_path = 'headers/';
     public static $footer_store_path = 'footers/';
     public static $custom_store_path = 'custom/';
@@ -175,6 +176,12 @@ class AppStorage
         }
         if ($module == 'HEADER') {
             $path = self::$client_store_path.$ref_id.'/'.self::$template_store_path.'/'.$file_ref_id.'/'.self::$header_store_path;
+            if ($folder != null) {
+                $path = $path.$folder.'/';
+            }
+        }
+        if ($module == 'PREVIEW') {
+            $path = self::$client_store_path.$ref_id.'/'.self::$template_store_path.'/'.$file_ref_id.'/'.self::$template_review_store_path;
             if ($folder != null) {
                 $path = $path.$folder.'/';
             }

@@ -228,4 +228,30 @@ class ApplicationController extends Controller
             return ApiResponse::send(500);
         }
     }
+
+    public function getAuthKey(Request $request) {
+        try {
+            $response = [];
+            // Validation given Data's
+            $validator = array(
+                'user'      => ['array', 'required'],
+                'client'    => ['array', 'required'],
+            );
+            $validator = Common::validator($request, $validator);
+            if ($validator && $validator->fails()) {
+                return ApiResponse::send(203, null, $validator->errors()->first(), true);
+            }
+            Common::changeClient();
+            $data = Client::getClientByAuthKey($request->client['authkey']);
+            if ($data) {
+                $response['auth_key'] = $data->authkey;
+                return ApiResponse::send(200, $response, "Auth Key");
+            } else {
+                return ApiResponse::send(203);
+            }
+        } catch (Exception $e) {
+            Log::info($e);
+            return null;
+        }
+    }
 }

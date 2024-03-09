@@ -9,6 +9,22 @@ class TargetQueue extends Model
 {
     use HasFactory;
 
+    public static $available_status = array(
+        1 => 'submitted',
+        2 => 'delivered',
+        3 => 'rejected' ,
+        4 => 'undeliverable',
+        5 => 'read'
+    );
+
+    public function getStatusAttribute() {
+        if (@$this->status_id) {
+            return self::$available_status[$this->status_id];
+        } else {
+            return null;
+        }
+    }
+
     public static function store($request) {
         try {
             $target_queue = new TargetQueue;

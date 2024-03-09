@@ -63,8 +63,11 @@ class TemplateConfigController extends Controller
                 return ApiResponse::send(203, null, $validator->errors()->first(), true);
             }
             $response['data'] = TemplateConfig::first($request);
-            if (@$response['data'] && @$response['data']->header) {
-                $response['data']['header_url'] = TemplateConfig::getHeaderUrl($request->client['id'], $response['data']);
+            if (@$response['data']) {
+                if ( @$response['data']->header) {
+                    $response['data']['header_url'] = TemplateConfig::getHeaderUrl($request->client['id'], $response['data']);
+                }
+                $response['data']['preview_url'] = TemplateConfig::getPreviewUrl($request->client['id'], $response['data']);
             }
             $response['whatsapp_configs'] = WhatsappConfig::get($request);
             $response['languages'] = CommonData::get('TEMPLATE_LANGUAGE');

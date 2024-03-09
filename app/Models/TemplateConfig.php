@@ -222,14 +222,21 @@ class TemplateConfig extends Model implements Auditable
             $template_config->footer             = (@$request->footer) ? json_encode($request->footer) : null;
             $template_config->status             = @$request->status;
             if($template_config->save()) { 
-                if (@$request->files && $request->file('header_file')) {
+                if (@$request->file('header_file')) {
                     $path = AppStorage::$client_store_path.$request->client['id'].'/'.AppStorage::$template_store_path.$template_config->id.'/'.AppStorage::$header_store_path;
                     $file = $request->file('header_file');
                     $file_name = $file->getClientOriginalName();
                     AppStorage::deleteFolder($path);
                     $file_upload = AppStorage::storeFile($file, $path, $file_name, '');
                 }
-                if (@$request->files && $request->file('custom_file')) {
+                if (@$request->file('preview_file')) {
+                    $path = AppStorage::$client_store_path.$request->client['id'].'/'.AppStorage::$template_store_path.$template_config->id.'/'.AppStorage::$template_review_store_path;
+                    $file = $request->file('preview_file');
+                    $file_name = $file->getClientOriginalName();
+                    AppStorage::deleteFolder($path);
+                    $file_upload = AppStorage::storeFile($file, $path, $file_name, '');
+                }
+                if (@$request->file('custom_file')) {
                     $path = AppStorage::$client_store_path.$request->client['id'].'/'.AppStorage::$template_store_path.$template_config->id.'/'.AppStorage::$custom_store_path;
                     $file = $request->file('custom_file');
                     $file_name = $file->getClientOriginalName();
@@ -271,6 +278,11 @@ class TemplateConfig extends Model implements Auditable
         return $path;
     }
     
+    public static function getPreviewUrl($client_id, $template_config) {
+        $path = AppStorage::getFolderFileUrl('PREVIEW', $client_id, $template_config->id);
+        return $path;
+    }
+    
     // public function getCustomUrl($request, $template_config) {
     //     $header = $template_config->header;
     //     if (@$header['field_type'] == 2) {
@@ -285,6 +297,18 @@ class TemplateConfig extends Model implements Auditable
                 dd($response);
             }
         } catch(Exception $e) {
+            Log::info($e);
+            return null;
+        }
+    }
+
+    public static function getClientTemplates($request) {
+        try {
+            $qry = TemplateConfig::with('language', 'selectedTemplateType')
+                                   ->whereNull('deleted_at');
+            $response = $qry->get();
+            return $response;
+        } catch (Exception $e) {
             Log::info($e);
             return null;
         }
