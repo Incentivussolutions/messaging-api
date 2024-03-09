@@ -16,6 +16,13 @@ class Status implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     protected $status;
+    protected $available_status = array(
+        'submitted' => 1,
+        'delivered' => 2,
+        'rejected'  => 3,
+        'undeliverable' => 4,
+        'read' => 5
+    );
     /**
      * Create a new job instance.
      */
@@ -36,7 +43,7 @@ class Status implements ShouldQueue
             $db_name = "messaging_".$status['client_ref'];
             $status_arr = array(
                 'message_ref_id' => @$status['message_uuid'],
-                'status'         => @$status['status'],
+                'status'         => @$this->available_status[$status['status']],
                 'status_code'    => (@$status['error']) ? @$status['error']['title'] : null,
                 'status_date'    => (@$status['timestamp']) ? Date::getDateTime($status['timestamp']) : null,
                 'rejected_reason'=> (@$status['error']) ? @$status['error']['detail'] : null,

@@ -125,7 +125,7 @@ class MessageController extends Controller
                 return ApiResponse::send(203, null, $validator->errors()->first(), true);
             }
             $response = StatusLog::getStatus($request);
-            return ApiResponse::send(200, $response, "Messages added in the queue successfully");
+            return ApiResponse::send(200, $response, "Status List");
         } catch(Exception $e) {
             Log::info($e);
             return ApiResponse::send(500);

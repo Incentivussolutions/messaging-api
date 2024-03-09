@@ -113,7 +113,7 @@ class UserController extends Controller
                 'client'    => ['array', 'required'],
                 'id'        => ['integer', 'nullable'],
                 'name'      => ['string', 'nullable'],
-                'email'     => ['string', 'unique:users,email,'.$user->id],
+                'email'     => ['string', 'unique:users,email,'.$request->id],
                 'password'  => ['string', 'nullable'],
                 'role_id'   => ['integer', 'nullable'],
                 'status'    => ['boolean', 'nullable']

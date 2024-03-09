@@ -11,6 +11,18 @@ class StatusLog extends Model
 {
     use HasFactory;
 
+    public static $available_status = array(
+        1 => 'submitted',
+        2 => 'delivered',
+        3 => 'rejected' ,
+        4 => 'undeliverable',
+        5 => 'read'
+    );
+
+    public function getStatusAttribute() {
+        return self::$available_status[$this->status];
+    }
+
     public static function getStatus($request) {
         try {
             $fields = array(
