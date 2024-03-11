@@ -73,7 +73,7 @@ class TemplateConfigController extends Controller
             $response['languages'] = CommonData::get('TEMPLATE_LANGUAGE');
             $response['input_types'] = CommonData::get('INPUT_TYPE');
             $response['field_types'] = CommonData::get('FIELD_TYPE');
-            $response['placeholders'] = CommonData::get('PLACHOLDER');
+            $response['placeholders'] = CommonData::get('PLACEHOLDER');
             if ($response) {
                 return ApiResponse::send(200, $response, 'Template Configuration form data');
             }

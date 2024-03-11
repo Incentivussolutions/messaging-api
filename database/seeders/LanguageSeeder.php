@@ -19,7 +19,7 @@ class LanguageSeeder extends Seeder
         ),
         array(
             "name" => "Irish",
-            "code" => "IE",
+            "code" => "ga",
             "status" => 1
         )
     );
