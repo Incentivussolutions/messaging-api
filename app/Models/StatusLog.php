@@ -54,7 +54,7 @@ class StatusLog extends Model
                                 ->join('status_logs', 'status_logs.message_ref_id', '=', 'response_logs.message_ref_id');
             $qry = Common::searchIndex($qry, $request, self::$search_fields);
             // $qry = Common::orderIndex($request, $qry);
-            $qry->orderBy('created_at', 'desc');
+            $qry->orderBy('status_logs.created_at', 'desc');
             $response = $qry->paginate(@$request->limit);
             return $response;
         } catch(Exception $e) {
