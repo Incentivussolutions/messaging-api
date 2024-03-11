@@ -32,6 +32,7 @@ class StatusLog extends Model
     );
 
     public static $fields = array(
+        'status_logs.id',
         'response_logs.phone_no',
         'response_logs.ref_id',
         'status_logs.message_ref_id',
