@@ -47,7 +47,8 @@ class Status implements ShouldQueue
                 'status_code'    => (@$status['error']) ? @$status['error']['title'] : null,
                 'status_date'    => (@$status['timestamp']) ? Date::getDateTime($status['timestamp']) : null,
                 'rejected_reason'=> (@$status['error']) ? @$status['error']['detail'] : null,
-                'status_response'=> json_encode($status)
+                'status_response'=> json_encode($status),
+                'created_at'     => Date::getDateTime()
             );
             DB::transaction(function () use ($db_name, $status_arr) {
                 DB::table($db_name.'.status_logs')->insert($status_arr);
