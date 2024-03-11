@@ -25,7 +25,7 @@ class Message implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($client, $to_number, $parameters, $template, $config, $target_queue)
+    public function __construct($client, $to_number, $ref_id, $parameters, $template, $config, $target_queue)
     {
         $this->client       = $client;
         $this->to_number    = $to_number;
