@@ -17,6 +17,7 @@ class Message implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     protected $client;
     protected $to_number;
+    protected $ref_id;
     protected $parameters;
     protected $template;
     protected $config;
@@ -28,6 +29,7 @@ class Message implements ShouldQueue
     {
         $this->client       = $client;
         $this->to_number    = $to_number;
+        $this->ref_id       = $ref_id;
         $this->parameters   = $parameters;
         $this->template     = $template;
         $this->config       = $config;
@@ -42,6 +44,7 @@ class Message implements ShouldQueue
         Log::info("Handling Message Job");
         $client         = $this->client;
         $to_number      = $this->to_number;
+        $ref_id         = $this->ref_id;
         $parameters     = $this->parameters;
         $this->template['language'] = (Object) $this->template['language'];
         $template       = (Object) $this->template;
@@ -60,6 +63,7 @@ class Message implements ShouldQueue
             'phone_no'       => @$to_number,
             'response_data'  => json_encode($response),
             'message_ref_id' => @$response['message_uuid'],
+            'ref_id'         => @$ref_id,
             'created_at'     => Date::getDateTime()
         );
         DB::transaction(function () use ($db_name, $log_arr) {

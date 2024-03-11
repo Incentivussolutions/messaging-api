@@ -33,6 +33,7 @@ class StatusLog extends Model
 
     public static $fields = array(
         'response_logs.phone_no',
+        'response_logs.ref_id',
         'status_logs.message_ref_id',
         'status_logs.status',
         'status_logs.status as status_id',
@@ -65,6 +66,7 @@ class StatusLog extends Model
         try {
             $fields = array(
                 'response_logs.phone_no',
+                'response_logs.ref_id',
                 'status_logs.message_ref_id',
                 'status_logs.status',
                 'status_logs.status_code',
@@ -77,6 +79,12 @@ class StatusLog extends Model
                                 ->where('target_queues.id', '=', $request->batch_id);
             if (@$request->status) {
                 $qry->where('status_logs.status', '=', @$request->status);
+            }
+            if (@$request->phone_no) {
+                $qry->where('response_logs.phone_no', '=', @$request->phone_no);
+            }
+            if (@$request->ref_id) {
+                $qry->where('response_logs.ref_id', '=', @$request->ref_id);
             }
             if (@$request->phone_no) {
                 $qry->where('response_logs.phone_no', '=', @$request->phone_no);

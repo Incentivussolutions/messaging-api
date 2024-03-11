@@ -75,6 +75,7 @@ class MessageController extends Controller
             if (@$request->get('to_Send')) {
                 foreach($request->get('to_send') as $key => $value) {
                     $validator['to_send'.$key.'to_number']  = ['required', 'string'];
+                    $validator['to_send'.$key.'ref_id']     = ['nullable', 'string'];
                     $validator['to_send'.$key.'parameters'] = ['required', 'array'];
                 }
             }
@@ -100,7 +101,7 @@ class MessageController extends Controller
             $target_queue = $target_queue->toArray();
             Common::changeClient();
             foreach($request->to_send as $key => $value) {
-                Message::dispatch($request->client, $value['to_number'], $value['parameters'], $template, $config, $target_queue)->onQueue('high');
+                Message::dispatch($request->client, $value['to_number'], @$value['ref_id'], $value['parameters'], $template, $config, $target_queue)->onQueue('high');
             }
             $response = array(
                 'batch_id' => $target_queue['id']
