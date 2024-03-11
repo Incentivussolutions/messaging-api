@@ -306,6 +306,9 @@ class TemplateConfig extends Model implements Auditable
         try {
             $qry = TemplateConfig::with('language', 'selectedTemplateType')
                                    ->whereNull('deleted_at');
+            if (@$request->language_id) {
+                $qry->where('template_configs.language_id', '=', $request->language_id);
+            }
             $response = $qry->get();
             return $response;
         } catch (Exception $e) {

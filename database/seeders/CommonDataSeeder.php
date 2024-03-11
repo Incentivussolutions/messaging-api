@@ -77,91 +77,91 @@ class CommonDataSeeder extends Seeder
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 1,
             "description" => "Firstname",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 2,
             "description" => "Lastname",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 3,
             "description" => "Email",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 4,
             "description" => "City",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 5,
             "description" => "County",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 6,
             "description" => "Country",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 7,
             "description" => "Additional_Field1",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 8,
             "description" => "Additional_Field2",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 9,
             "description" => "Additional_Field3",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 10,
             "description" => "Additional_Field4",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 11,
             "description" => "Additional_Field5",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 12,
             "description" => "Additional_Field6",
             "reference" => NULL,
             "sample" => NULL
         ),
         array(
-            "type" => "PLACHOLDER",
+            "type" => "PLACEHOLDER",
             "value" => 13,
             "description" => "Additional_Field7",
             "reference" => NULL,
