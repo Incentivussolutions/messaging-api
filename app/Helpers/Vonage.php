@@ -65,6 +65,7 @@ class Vonage {
                 }
                 if ($base_message) {
                     $base_message->setClientRef(@$client['unique_id']);
+                    Log::info("Message");
                     Log::info($base_message->getCustom());
                     $response = $vonage_client->messages()->send($base_message);
                 }
@@ -115,6 +116,9 @@ class Vonage {
 
     public static function getComponents($client, $template, $client_parameters) {
         try {
+            $client_parameters = array_change_key_case($client_parameters, CASE_LOWER);
+            Log::info("Client Params");
+            Log::info($client_parameters);
             $components = array();
             $header = $template->header;
             if(@$header) {
@@ -204,6 +208,8 @@ class Vonage {
             $body = $template->template_content;
             if(@$body) {
                 $params = self::getParameters($body);
+                Log::info("Body Params");
+                Log::info($params);
                 if (count($params) > 0) {
                     $body_parameters = array();
                     foreach($params as $k => $v) {
@@ -224,6 +230,9 @@ class Vonage {
             $footer = $template->footer;
             if(@$footer) {
                 $footer_parameters = array();
+                Log::info($footer);
+                Log::info("Body Params");
+                Log::info($footer_parameters);
                 foreach($footer as $key => $value) {
                     if ($key == 'text') {
                         $params = self::getParameters($value);

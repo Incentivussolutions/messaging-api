@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Helpers\Common;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticateClient
@@ -18,6 +19,7 @@ class AuthenticateClient
      */
     public function handle(Request $request, Closure $next)
     {
+        Log::info($request->all());
         if(!$request->get('auth_key')) {
             return ApiResponse::send(401);
         }
