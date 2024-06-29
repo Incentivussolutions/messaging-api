@@ -215,7 +215,8 @@ class Common {
     public static function getClientAuthKey($client) {
         $uniqid = null;
         try {
-            $auth_key = Str::upper($client->name.$client->id.date('Ymdhis'));
+            $client_name = preg_replace('/\s+/', '', $client->name);
+            $auth_key = Str::upper($client_name.$client->id.date('Ymdhis'));
             return $auth_key;
         } catch(Exception $e) {
             Log::info($e);

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\Date;
 use App\Helpers\Common;
 use App\Models\TargetQueue;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -50,7 +51,13 @@ class StatusLog extends Model
     public static function index($request) {
         $response = null;
         try {
-            $qry = TargetQueue::select(static::$fields)
+            $fields = static::$fields;
+            $other_fields = array(
+                'template_configs.template_name'
+            );
+            $fields = array_merge($fields, $other_fields);
+            $qry = TargetQueue::select($fields)
+                                ->join('template_configs', 'template_configs.template_id', '=', "target_queues.request_data->template_id")
                                 ->join('response_logs', 'response_logs.target_queue_id', '=', 'target_queues.id')
                                 ->join('status_logs', 'status_logs.message_ref_id', '=', 'response_logs.message_ref_id');
             $qry = Common::searchIndex($qry, $request, self::$search_fields);
